@@ -26,11 +26,11 @@ public class StudentController {
 		try (Connection conn = DriverManager.getConnection(url, user, password)) {
 			StudentDAO studentDAO = new StudentDAO(conn);
 			studentDAO.addStudent(payload.getName(), payload.getEmail());
-
+			
 			// This line ONLY executes if addStudent succeeds without throwing an exception
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body("Student " + payload.getName() + " added successfully!");
-
+					
 		} catch (SQLException e) {
 			// If a database error occurs, execution jumps straight here,
 			// bypassing the success return above completely.
