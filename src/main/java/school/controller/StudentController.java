@@ -3,15 +3,18 @@ package school.controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import school.dao.StudentDAO;
+import school.model.Student;
 
 @RestController
 @RequestMapping("/api/students")
@@ -24,13 +27,13 @@ public class StudentController {
 		String password = System.getenv("DB_PASSWORD");
 
 		try (Connection conn = DriverManager.getConnection(url, user, password)) {
-			StudentDAO studentDAO = new StudentDAO(conn);
-			studentDAO.addStudent(payload.getName(), payload.getEmail());
-			
+			StudentDAO dao = new StudentDAO(conn);
+			dao.addStudent(payload.getName(), payload.getEmail());
+
 			// This line ONLY executes if addStudent succeeds without throwing an exception
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body("Student " + payload.getName() + " added successfully!");
-					
+
 		} catch (SQLException e) {
 			// If a database error occurs, execution jumps straight here,
 			// bypassing the success return above completely.
@@ -38,6 +41,23 @@ public class StudentController {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Email already exists.");
 			}
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error: " + e.getMessage());
+		}
+	}
+
+	//
+
+	@GetMapping
+	public ResponseEntity<List<Student>> getStudents() {
+		String url = System.getenv("DB_URL");
+		String user = System.getenv("DB_USER");
+		String password = System.getenv("DB_PASSWORD");
+
+		try (Connection conn = DriverManager.getConnection(url, user, password)) {
+			StudentDAO dao = new StudentDAO(conn);
+			List<Student> students = dao.getAllStudents();
+			return ResponseEntity.ok(students);
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
 }
