@@ -43,17 +43,7 @@ public class StudentController {
 
 	@GetMapping
 	public ResponseEntity<List<Student>> getStudents() {
-		String url = System.getenv("DB_URL");
-		String user = System.getenv("DB_USER");
-		String password = System.getenv("DB_PASSWORD");
-
-		try (Connection conn = DriverManager.getConnection(url, user, password)) {
-			StudentDAO dao = new StudentDAO(conn);
-			List<Student> students = dao.getAllStudents();
-			return ResponseEntity.ok(students);
-		} catch (SQLException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+		return StudentService.fetchAllStudents();
 	}
 }
 
