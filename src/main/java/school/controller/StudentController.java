@@ -30,21 +30,16 @@ public class StudentController {
 			StudentDAO dao = new StudentDAO(conn);
 			dao.addStudent(payload.getName(), payload.getEmail());
 
-			// This line ONLY executes if addStudent succeeds without throwing an exception
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body("Student " + payload.getName() + " added successfully!");
 
 		} catch (SQLException e) {
-			// If a database error occurs, execution jumps straight here,
-			// bypassing the success return above completely.
 			if ("23505".equals(e.getSQLState())) {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Email already exists.");
 			}
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error: " + e.getMessage());
 		}
 	}
-
-	//
 
 	@GetMapping
 	public ResponseEntity<List<Student>> getStudents() {
