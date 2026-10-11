@@ -50,4 +50,27 @@ public class StudentDAO {
 		}
 		return students;
 	}
+
+	//
+	public Student getStudentByID(String id) {
+		String sql = "SELECT id, name, email FROM students WHERE id = ?";
+		Student student = null;
+
+		try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+			stmt.setInt(1, Integer.parseInt(id));
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					int studentId = rs.getInt("id");
+					String name = rs.getString("name");
+					String email = rs.getString("email");
+
+					student = new Student(studentId, name, email);
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error fetching student: " + e.getMessage());
+		}
+		return student;
+	}
 }
